@@ -1,0 +1,39 @@
+package com.learnforge.learning.mq;
+
+import com.learnforge.common.constants.MqConstants;
+import com.learnforge.learning.domain.enums.PointsRecordType;
+import com.learnforge.learning.mq.message.SignInMessage;
+import com.learnforge.learning.service.IPointsRecordService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class LearningPointsListener {
+
+    private final IPointsRecordService recordService;
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "qa.points.queue", durable = "true"),
+            exchange = @Exchange(name = MqConstants.Exchange.LEARNING_EXCHANGE, type = ExchangeTypes.TOPIC),
+            key = MqConstants.Key.WRITE_REPLY
+    ))
+    public void listenWriteReplyMessage(Long userId){
+        recordService.addPointsRecord(userId,5, PointsRecordType.QA);
+    }
+
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "sign.points.queue", durable = "true"),
+            exchange = @Exchange(name = MqConstants.Exchange.LEARNING_EXCHANGE, type = ExchangeTypes.TOPIC),
+            key = MqConstants.Key.WRITE_REPLY
+    ))
+    public void listenSignInMessage(SignInMessage message){
+        recordService.addPointsRecord(message.getUserId(),message.getPoints(), PointsRecordType.SIGN);
+    }
+}

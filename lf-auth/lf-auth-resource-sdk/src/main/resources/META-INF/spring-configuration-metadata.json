@@ -1,0 +1,31 @@
+{
+  "groups": [
+    {
+      "name": "tj.auth.resource",
+      "type": "com.learnforge.authsdk.resource.config.ResourceInterceptorConfiguration",
+      "sourceType": "com.learnforge.authsdk.resource.config.ResourceAuthProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "tj.auth.resource.enable",
+      "type": "java.lang.Boolean",
+      "description": "Enable login interception feature, specify interception paths if enabled, default intercept all",
+      "sourceType": "com.learnforge.authsdk.resource.config.ResourceAuthProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "tj.auth.resource.includeLoginPaths",
+      "type": "java.util.List",
+      "description": "Paths to intercept, for example: /user/**",
+      "sourceType": "com.learnforge.authsdk.resource.config.ResourceAuthProperties"
+    },
+    {
+      "name": "tj.auth.resource.excludeLoginPaths",
+      "type": "java.util.List",
+      "description": "Paths not to intercept, for example: /user/**",
+      "sourceType": "com.learnforge.authsdk.resource.config.ResourceAuthProperties"
+    }
+  ],
+  "hints": []
+}

@@ -1,0 +1,51 @@
+server:
+  port: 8091
+  tomcat:
+    uri-encoding: UTF-8
+spring:
+  profiles:
+    active: dev
+  application:
+    name: promotion-service
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        shared-configs:
+          - data-id: shared-spring.yaml
+            refresh: false
+          - data-id: shared-redis.yaml
+            refresh: false
+          - data-id: shared-mybatis.yaml
+            refresh: false
+          - data-id: shared-logs.yaml
+            refresh: false
+          - data-id: shared-feign.yaml
+            refresh: false
+          - data-id: shared-mq.yaml
+            refresh: false
+          - data-id: shared-xxljob.yaml
+            refresh: false
+
+tj:
+  swagger:
+    enable: true
+    enableResponseWrap: true
+    package-path: com.learnforge.promotion.controller
+    title: LearnForge - Promotion Service API
+    description: Coupon lifecycle management, exchange codes, concurrent claiming, and discount optimization.
+    contact-name: LearnForge Project
+    contact-url: https://github.com/lusy37/tjxt
+    contact-email: portfolio@example.com
+    version: v1.0
+  jdbc:
+    database: tj_promotion
+  auth:
+    resource:
+      enable: true
+      exclude-login-paths:
+        - /coupons/list
+  mq:
+    listener:
+      retry:
+        stateless: false

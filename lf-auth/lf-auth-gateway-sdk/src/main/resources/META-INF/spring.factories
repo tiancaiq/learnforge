@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.learnforge.authsdk.gateway.config.AuthAutoConfiguration

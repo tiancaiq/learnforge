@@ -1,0 +1,101 @@
+server:
+  port: 10010  #Port
+  tomcat:
+    uri-encoding: UTF-8   #Service Code
+spring:
+  profiles:
+    active: dev
+  application:
+    name: gateway-service
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        shared-configs: # Shared Configuration
+          - data-id: shared-spring.yaml # Shared Spring Configuration
+            refresh: false
+          - data-id: shared-redis.yaml # Shared Redis Configuration
+            refresh: false
+          - data-id: shared-logs.yaml # Shared Logging Configuration
+            refresh: false
+    gateway:
+      routes:
+        - id: ms
+          uri: lb://media-service
+          predicates:
+            - Path=/ms/**
+        - id: as
+          uri: lb://auth-service
+          predicates:
+            - Path=/as/**
+          filters:
+            - PreserveHostHeader
+        - id: ds
+          uri: lb://data-service
+          predicates:
+            - Path=/ds/**
+        - id: sms
+          uri: lb://message-service
+          predicates:
+            - Path=/sms/**
+        - id: us
+          uri: lb://user-service
+          predicates:
+            - Path=/us/**
+        - id: cs
+          uri: lb://course-service
+          predicates:
+            - Path=/cs/**
+        - id: os
+          uri: lb://order-service
+          predicates:
+            - Path=/os/**
+        - id: ss
+          uri: lb://search-service
+          predicates:
+            - Path=/ss/**
+        - id: ls
+          uri: lb://learning-service
+          predicates:
+            - Path=/ls/**
+        - id: ps
+          uri: lb://pay-service
+          predicates:
+            - Path=/ps/**
+        - id: ts
+          uri: lb://trade-service
+          predicates:
+            - Path=/ts/**
+        - id: es
+          uri: lb://exam-service
+          predicates:
+            - Path=/es/**
+        - id: rs
+          uri: lb://remark-service
+          predicates:
+            - Path=/rs/**
+        - id: prs
+          uri: lb://promotion-service
+          predicates:
+            - Path=/prs/**
+      default-filters:
+        - StripPrefix=1
+      globalcors: # Global Cross-Origin Handling
+        add-to-simple-url-handler-mapping: true # Resolve options request interception issue
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns: # Allow Cross-Origin Requests from Which Websites
+              - "*"
+            allowedMethods: # Allowed Cross-Origin AJAX Request Methods
+              - "GET"
+              - "POST"
+              - "DELETE"
+              - "PUT"
+              - "OPTIONS"
+            allowedHeaders: "*" # Allowed Headers in Requests
+            allowCredentials: true # Allow Cookie
+            maxAge: 360000 # Validity Period of This Cross-Origin Check
+
+logging:
+  level:
+    com.learnforge: debug

@@ -1,0 +1,44 @@
+server:
+  port: 8090
+  tomcat:
+    uri-encoding: UTF-8
+spring:
+  profiles:
+    active: dev
+  application:
+    name: learning-service
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        shared-configs:
+          - data-id: shared-spring.yaml
+            refresh: false
+          - data-id: shared-redis.yaml
+            refresh: false
+          - data-id: shared-mybatis.yaml
+            refresh: false
+          - data-id: shared-logs.yaml
+            refresh: false
+          - data-id: shared-feign.yaml
+            refresh: false
+          - data-id: shared-mq.yaml
+            refresh: false
+          - data-id: shared-xxljob.yaml
+            refresh: false
+tj:
+  swagger:
+    enable: true
+    enableResponseWrap: true
+    package-path: com.learnforge.learning.controller
+    title: LearnForge - Learning Service API
+    description: Learning progress, study plans, check-ins, points, leaderboards, and course Q&A.
+    contact-name: LearnForge Project
+    contact-url: https://github.com/lusy37/tjxt
+    contact-email: portfolio@example.com
+    version: v1.0
+  jdbc:
+    database: tj_learning
+  auth:
+    resource:
+      enable: true

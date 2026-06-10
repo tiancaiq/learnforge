@@ -1,0 +1,44 @@
+package com.learnforge.exam.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.learnforge.api.dto.exam.QuestionDTO;
+import com.learnforge.common.domain.dto.PageDTO;
+import com.learnforge.exam.domain.dto.QuestionFormDTO;
+import com.learnforge.exam.domain.po.Question;
+import com.learnforge.exam.domain.query.QuestionPageQuery;
+import com.learnforge.exam.domain.vo.QuestionDetailVO;
+import com.learnforge.exam.domain.vo.QuestionPageVO;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * <p>
+ * Question service class
+ * </p>
+ *
+ * @author LearnForge contributors
+ * @since 2022-09-02
+ */
+public interface IQuestionService extends IService<Question> {
+
+    void addQuestion(QuestionFormDTO questionFormDTO);
+
+    void updateQuestion(QuestionFormDTO questionDTO);
+
+    void deleteQuestionById(Long id);
+
+    PageDTO<QuestionPageVO> queryQuestionByPage(QuestionPageQuery query);
+
+    QuestionDetailVO queryQuestionDetailById(Long id);
+
+    List<QuestionDTO> queryQuestionByIds(List<Long> ids);
+
+    Map<Long, Integer> countQuestionNumOfCreater(List<Long> createrIds);
+
+    List<QuestionDTO> queryQuestionByBizId(Long bizId);
+
+    Boolean checkNameValid(String name);
+
+    Map<Long, Integer> queryQuestionScores(List<Long> ids);
+}

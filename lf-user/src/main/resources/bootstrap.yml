@@ -1,0 +1,48 @@
+server:
+  port: 8082  #Port
+  tomcat:
+    uri-encoding: UTF-8   #Service Code
+spring:
+  profiles:
+    active: dev
+  application:
+    name: user-service
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        shared-configs: # Shared Configuration
+          - data-id: shared-spring.yaml # Shared Spring Configuration
+            refresh: false
+          - data-id: shared-redis.yaml # Shared Redis Configuration
+            refresh: false
+          - data-id: shared-mybatis.yaml # Shared MyBatis Configuration
+            refresh: false
+          - data-id: shared-logs.yaml # Shared Logging Configuration
+            refresh: false
+          - data-id: shared-feign.yaml # Shared Feign Configuration
+            refresh: false
+tj:
+  swagger:
+    enable: true
+    enableResponseWrap: true
+    package-path: com.learnforge.user.controller
+    title: LearnForge - User Service API
+    description: This service manages user management and user information management
+    contact-name: LearnForge Project
+    contact-url: http://www.itcast.cn/
+    contact-email: zhanghuyi@itcast.cn
+    version: v1.0
+  auth:
+    resource:
+      enable: true
+      excludeLoginPaths:
+        - /students/register
+        - /users/detail/{isStaff}
+        - /users/list
+        - GET:/users/{id}
+        - /users/{id}/type
+        - /users/ids
+        - /users/me
+  jdbc:
+    database: tj_user

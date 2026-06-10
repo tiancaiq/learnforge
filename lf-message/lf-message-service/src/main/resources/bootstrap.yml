@@ -1,0 +1,52 @@
+server:
+  port: 8085  #Port
+  tomcat:
+    uri-encoding: UTF-8   #Service Code
+spring:
+  profiles:
+    active: dev
+  application:
+    name: message-service
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        shared-configs: # Shared Configuration
+          - data-id: shared-spring.yaml # Shared Spring Configuration
+            refresh: false
+          - data-id: shared-redis.yaml # Shared Redis Configuration
+            refresh: false
+          - data-id: shared-mybatis.yaml # Shared MyBatis Configuration
+            refresh: false
+          - data-id: shared-logs.yaml # Shared Logging Configuration
+            refresh: false
+          - data-id: shared-feign.yaml # Shared Feign Configuration
+            refresh: false
+          - data-id: shared-mq.yaml # Shared MQ Configuration
+            refresh: false
+tj:
+  swagger:
+    enable: true
+    enableResponseWrap: true
+    package-path: com.learnforge.message.controller
+    title: LearnForge - Messaging Service API
+    description: This service is used for station messages, notification management, SMS sending, etc.
+    contact-name: LearnForge Project
+    contact-url: http://www.itcast.cn/
+    contact-email: zhanghuyi@itcast.cn
+    version: v1.0
+  auth:
+    resource:
+      enable: true
+      excludeLoginPaths:
+        - /students/register
+        - /users/detail/{isStaff}
+        - /users/list
+        - GET:/users/{id}
+        - /users/{id}/type
+        - /users/ids
+  jdbc:
+    database: tj_message
+  sms:
+    ali:
+

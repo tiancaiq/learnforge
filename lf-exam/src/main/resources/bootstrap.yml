@@ -1,0 +1,40 @@
+server:
+  port: 8089  #Port
+  tomcat:
+    uri-encoding: UTF-8   #Service Code
+  error:
+    include-message: always #The response body includes a message
+spring:
+  profiles:
+    active: dev
+  application:
+    name: exam-service
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        shared-configs: # Shared Configuration
+          - dataId: shared-spring.yaml # Shared Spring Configuration
+          - dataId: shared-redis.yaml # Shared Redis Configuration
+          - dataId: shared-mybatis.yaml # Shared MyBatis Configuration
+          - dataId: shared-logs.yaml # Shared Logging Configuration
+          - dataId: shared-feign.yaml # Shared Feign Configuration
+          - dataId: shared-mq.yaml # Shared MQ Configuration
+          - dataId: shared-xxljob.yaml # Shared MQ Configuration
+          - dataId: shared-seata.yaml # Shared Seata Configuration
+tj:
+  swagger:
+    enable: true
+    enableResponseWrap: true
+    package-path: com.learnforge.exam.controller
+    title: LearnForge - Assessment Service API
+    description: This service provides question management, exam management, and data statistics functions
+    contact-name: LearnForge Project
+    contact-url: http://www.itcast.cn/
+    contact-email: zhanghuyi@itcast.cn
+    version: v1.0
+  jdbc:
+    database: tj_exam
+  auth:
+    resource:
+      enable: false

@@ -1,0 +1,39 @@
+server:
+  port: 8088  #Port
+  tomcat:
+    uri-encoding: UTF-8   #Service Code
+spring:
+  profiles:
+    active: dev
+  application:
+    name: trade-service
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        shared-configs: # Shared Configuration
+          - dataId: shared-spring.yaml # Shared Spring Configuration
+          - dataId: shared-redis.yaml # Shared Redis Configuration
+          - dataId: shared-mybatis.yaml # Shared MyBatis Configuration
+          - dataId: shared-logs.yaml # Shared Logging Configuration
+          - dataId: shared-feign.yaml # Shared Feign Configuration
+          - dataId: shared-mq.yaml # Shared MQ Configuration
+          - dataId: shared-xxljob.yaml # Shared MQ Configuration
+tj:
+  swagger:
+    enable: true
+    enableResponseWrap: true
+    package-path: com.learnforge.trade.controller
+    title: LearnForge - Commerce Service API
+    description: This service provides shopping cart, order management, etc.
+    contact-name: LearnForge Project
+    contact-url: http://www.itcast.cn/
+    contact-email: zhanghuyi@itcast.cn
+    version: v1.0
+  jdbc:
+    database: tj_trade
+  auth:
+    resource:
+      enable: true
+      excludeLoginPaths:
+        - "/order-details/enrollNum"

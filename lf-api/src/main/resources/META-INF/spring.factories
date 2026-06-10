@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.learnforge.api.config.RequestIdRelayConfiguration, \
+  com.learnforge.api.config.RoleCacheConfig, \
+  com.learnforge.api.config.FallbackConfig, \
+  com.learnforge.api.config.CategoryCacheConfig

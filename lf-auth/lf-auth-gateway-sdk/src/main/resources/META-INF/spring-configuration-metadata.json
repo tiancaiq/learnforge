@@ -1,0 +1,19 @@
+{
+  "groups": [
+    {
+      "name": "tj.auth.gateway",
+      "type": "com.learnforge.authsdk.gateway.config.AuthAutoConfiguration",
+      "sourceType": "com.learnforge.authsdk.gateway.config.AuthProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "tj.auth.excludePath",
+      "type": "java.util.Set",
+      "description": "Paths accessible without login, ant-style wildcard pattern",
+      "sourceType": "com.learnforge.authsdk.gateway.config.AuthProperties",
+      "defaultValue": ""
+    }
+  ],
+  "hints": []
+}

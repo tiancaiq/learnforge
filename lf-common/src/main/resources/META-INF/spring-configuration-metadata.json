@@ -1,0 +1,269 @@
+{
+  "groups": [
+    {
+      "name": "tj.swagger",
+      "type": "com.learnforge.common.autoconfigure.swagger.Knife4jConfiguration",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties"
+    },
+    {
+      "name": "tj.mq"
+    },
+    {
+      "name": "tj.redis"
+    },
+    {
+      "name": "tj.mybatis"
+    },
+    {
+      "name": "tj.xxl-job",
+      "type": "com.learnforge.common.autoconfigure.xxljob.XxlJobConfig",
+      "sourceType": "com.learnforge.common.autoconfigure.xxljob.XxlJobProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "tj.swagger.enable",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable swagger function, default false",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "tj.swagger.enableResponseWrap",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable response result packaging function, default false",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "tj.swagger.packagePath",
+      "type": "java.lang.String",
+      "description": "API interface scan package",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.swagger.title",
+      "type": "java.lang.String",
+      "description": "API document title",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.swagger.description",
+      "type": "java.lang.String",
+      "description": "Document description",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.swagger.contactName",
+      "type": "java.lang.String",
+      "description": "Contact person name",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.swagger.contactUrl",
+      "type": "java.lang.String",
+      "description": "Contact person home page address",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.swagger.contactEmail",
+      "type": "java.lang.String",
+      "description": "Contact person email",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.swagger.version",
+      "type": "java.lang.String",
+      "description": "Version",
+      "sourceType": "com.learnforge.common.autoconfigure.swagger.SwaggerConfigProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.mq.host",
+      "type": "java.lang.String",
+      "description": "RabbitMQ address",
+      "defaultValue": "192.168.150.101"
+    },
+    {
+      "name": "tj.mq.port",
+      "type": "java.lang.Integer",
+      "description": "RabbitMQ port",
+      "defaultValue": "5672"
+    },
+    {
+      "name": "tj.mq.vhost",
+      "type": "java.lang.String",
+      "description": "RabbitMQ virtual-host address",
+      "defaultValue": "/learnforge"
+    },
+    {
+      "name": "tj.mq.username",
+      "type": "java.lang.String",
+      "description": "RabbitMQ username",
+      "defaultValue": "learnforge"
+    },
+    {
+      "name": "tj.mq.password",
+      "type": "java.lang.String",
+      "description": "RabbitMQ password",
+      "defaultValue": "123321"
+    },
+    {
+      "name": "tj.mq.listener.retry.enable",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable RabbitMQ consumer retry mechanism",
+      "defaultValue": "true"
+    },
+    {
+      "name": "tj.mq.listener.retry.interval",
+      "type": "java.time.Duration",
+      "description": "Consumer retry initial failure waiting duration",
+      "defaultValue": "1000ms"
+    },
+    {
+      "name": "tj.mq.listener.retry.multiplier",
+      "type": "java.lang.Integer",
+      "description": "Failure waiting duration increment multiplier",
+      "defaultValue": "1"
+    },
+    {
+      "name": "tj.mq.listener.retry.max-attempts",
+      "type": "java.lang.Integer",
+      "description": "Consumer maximum retry count",
+      "defaultValue": "3"
+    },
+    {
+      "name": "tj.mq.listener.retry.stateless",
+      "type": "java.lang.Boolean",
+      "description": "Is stateless, default true",
+      "defaultValue": "true"
+    },
+    {
+      "name": "tj.redis.host",
+      "type": "java.lang.Boolean",
+      "description": "Is stateless, default true",
+      "defaultValue": "true"
+    },
+    {
+      "name": "tj.redis.host",
+      "type": "java.lang.String",
+      "description": "Redis address",
+      "defaultValue": "192.168.150.101"
+    },
+    {
+      "name": "tj.redis.password",
+      "type": "java.lang.String",
+      "description": "Redis password",
+      "defaultValue": "123321"
+    },
+    {
+      "name": "tj.redis.pool.max-active",
+      "type": "java.lang.Integer",
+      "description": "Redis connection pool maximum connection count",
+      "defaultValue": "8"
+    },
+    {
+      "name": "tj.redis.pool.max-idle",
+      "type": "java.lang.Integer",
+      "description": "Redis maximum idle connections",
+      "defaultValue": "8"
+    },
+    {
+      "name": "tj.redis.pool.min-idle",
+      "type": "java.lang.Integer",
+      "description": "Redis minimum idle connections",
+      "defaultValue": "1"
+    },
+    {
+      "name": "tj.redis.pool.max-wait",
+      "type": "java.lang.Integer",
+      "description": "Maximum idle connection waiting time when no connection",
+      "defaultValue": "300"
+    },
+    {
+      "name": "tj.jdbc.host",
+      "type": "java.lang.String",
+      "description": "Database address",
+      "defaultValue": "192.168.150.101"
+    },
+    {
+      "name": "tj.jdbc.port",
+      "type": "java.lang.Integer",
+      "description": "Database port",
+      "defaultValue": "3306"
+    },
+    {
+      "name": "tj.jdbc.database",
+      "type": "java.lang.String",
+      "description": "Database database name",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.jdbc.username",
+      "type": "java.lang.String",
+      "description": "Database username",
+      "defaultValue": "root"
+    },
+    {
+      "name": "tj.jdbc.password",
+      "type": "java.lang.String",
+      "description": "Database password",
+      "defaultValue": "123"
+    },
+    {
+      "name": "tj.xxl-job.accessToken",
+      "type": "java.lang.String",
+      "description": "xxl-job access token",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.xxl-job.admin.address",
+      "type": "java.lang.String",
+      "description": "xxl-job admin address",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.xxl-job.executor.appName",
+      "type": "java.lang.String",
+      "description": "xxl-job executor name",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.xxl-job.executor.address",
+      "type": "java.lang.String",
+      "description": "xxl-job executor address, ip:port, can be empty",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.xxl-job.executor.ip",
+      "type": "java.lang.String",
+      "description": "xxl-job executor ip",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.xxl-job.executor.port",
+      "type": "java.lang.String",
+      "description": "xxl,job executor port, random if empty",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.xxl-job.executor.logPath",
+      "type": "java.lang.String",
+      "description": "xxl-job executor log directory",
+      "defaultValue": ""
+    },
+    {
+      "name": "tj.xxl-job.executor.logRetentionDays",
+      "type": "java.lang.String",
+      "description": "xxl-job executor log storage maximum retention period, expired logs will be cleaned",
+      "defaultValue": ""
+    }
+  ],
+  "hints": []
+}

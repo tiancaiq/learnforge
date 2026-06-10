@@ -1,0 +1,9 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+ com.learnforge.common.autoconfigure.mq.MqConfig,\
+ com.learnforge.common.autoconfigure.mvc.JsonConfig,\
+ com.learnforge.common.autoconfigure.mvc.MvcConfig,\
+ com.learnforge.common.autoconfigure.mvc.ParamCheckerConfig,\
+ com.learnforge.common.autoconfigure.mybatis.MybatisConfig,\
+ com.learnforge.common.autoconfigure.redisson.RedissonConfig,\
+ com.learnforge.common.autoconfigure.swagger.Knife4jConfiguration, \
+ com.learnforge.common.autoconfigure.xxljob.XxlJobConfig
