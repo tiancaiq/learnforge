@@ -108,6 +108,3 @@ mvn -DskipTests compile
 
 The complete 27-module Maven reactor has been compiled successfully with JDK 11. Runtime verification requires the external infrastructure and configuration referenced by the service bootstrap files.
 
-## Project background
-
-LearnForge is an English-language, rebranded adaptation of the educational [lusy37/tjxt](https://github.com/lusy37/tjxt) project. It was completed as a guided backend systems project, with the portfolio work centered on understanding, implementing, and documenting the learning, promotion, and engagement services.
