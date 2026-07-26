@@ -1,147 +1,113 @@
 # LearnForge
 
-LearnForge is a backend Java microservices platform for online course delivery, learning progress tracking, promotions, and order processing. This repository contains the service layer and infrastructure integrations; it does not include frontend code.
+LearnForge is a backend-only online learning platform built as a set of Spring Cloud microservices. It covers course delivery, learning activity, promotions, engagement, search, orders, payments, notifications, and reporting. The repository does not contain frontend code.
 
-The portfolio edition is designed for high-concurrency backend workloads involving coupon claims, exchange-code redemption, learning progress updates, check-ins, and real-time leaderboards. It uses Redis atomic operations, distributed locks, asynchronous messaging, and write coalescing to reduce database contention and protect shared state.
+The main portfolio work is concentrated in three services:
 
-## Project Highlights
+- `lf-learning`: video progress, study plans, Q&A, check-ins, points, and seasonal leaderboards
+- `lf-promotion`: coupon issuance, high-concurrency claims, exchange codes, and discount selection
+- `lf-remark`: reusable likes, batched count propagation, and asynchronous persistence
 
-- Tracks lessons, video progress, study plans, daily check-ins, and course Q&A.
-- Maintains real-time points leaderboards with Redis sorted sets.
-- Archives seasonal leaderboard data into dynamically routed MySQL tables.
-- Supports coupon publishing, claiming, redemption, exchange codes, and expiration.
-- Protects coupon inventory with Redis and distributed locks during concurrent requests.
-- Uses atomic Redis counters to enforce coupon inventory and per-user claim limits.
-- Evaluates coupon combinations in parallel to find the best available discount.
-- Uses RabbitMQ to decouple learning events, rewards, orders, and promotion workflows.
+## Engineering focus
 
-## Core Services
+### High-concurrency coupon claims
 
-| Service | Responsibility |
-| --- | --- |
-| `lf-learning` | Learning progress, study plans, check-ins, points, leaderboards, and Q&A |
-| `lf-promotion` | Coupon lifecycle, exchange codes, inventory protection, and discount calculation |
-| `lf-course` | Course content, categories, instructors, media references, and publishing |
-| `lf-trade` | Shopping cart, orders, enrollment, payment status, and refunds |
-| `lf-user` | Students, instructors, staff accounts, and user profiles |
-| `lf-auth` | Authentication, authorization, roles, menus, and permissions |
-| `lf-search` | Course search and interest-based discovery |
-| `lf-media` | File and video metadata management |
-| `lf-message` | In-app notifications and SMS workflows |
-| `lf-gateway` | API routing and authentication propagation |
+Coupon inventory and per-user limits are kept in Redis during an active campaign. A claim is serialized by coupon ID with a Redisson lock, then validated through atomic Redis hash increments. If inventory, user limits, or message publishing fails, the service compensates the Redis counters before returning an error.
 
-## Architecture
+Successful claims are sent to RabbitMQ. The consumer performs a second database-level validation, conditionally increments issued inventory, and creates the user's coupon record in a transaction. This keeps the request path short while retaining a persistent consistency check.
 
 ```mermaid
 flowchart LR
-    Gateway[Spring Cloud Gateway] --> Auth[Auth Service]
-    Gateway --> Course[Course Service]
-    Gateway --> Learning[Learning Service]
-    Gateway --> Promotion[Promotion Service]
-    Gateway --> Trade[Trade Service]
-
-    Learning --> Redis[(Redis)]
-    Promotion --> Redis
-    Course --> MySQL[(MySQL)]
-    Learning --> MySQL
-    Promotion --> MySQL
-    Trade --> MySQL
-
-    Learning <--> MQ[RabbitMQ]
-    Promotion <--> MQ
-    Trade <--> MQ
-    Course --> Search[(Elasticsearch)]
-    Services[Microservices] --> Nacos[Nacos Discovery and Config]
-    Services --> Jobs[XXL-JOB]
+    Request["Coupon claim"] --> Lock["Redisson lock by coupon ID"]
+    Lock --> Redis["Redis inventory and user limit"]
+    Redis --> MQ["RabbitMQ claim event"]
+    MQ --> Consumer["Transactional consumer"]
+    Consumer --> MySQL["MySQL coupon and user-coupon records"]
+    Failure["Validation or publish failure"] -. "restore counters" .-> Redis
 ```
 
-## Technology Stack
+### Learning progress and rewards
 
-### Backend
+Video playback updates are coalesced instead of writing every progress event directly to MySQL. The service caches the latest section position in a Redis Hash and schedules delayed persistence through a `DelayQueue`; section completion is written immediately.
 
-- Java 11 and Spring Boot 2.7
-- Spring MVC and REST APIs
-- Spring Cloud Gateway
-- OpenFeign for service-to-service HTTP calls
-- Spring Cloud LoadBalancer
-- Sentinel for service protection and fallback handling
+Daily check-ins use one Redis Bitmap per user and month. Bit operations detect duplicate check-ins and calculate consecutive-day streaks without storing one row per day. Q&A and check-in events publish rewards through RabbitMQ, while Redis Sorted Sets maintain the current points leaderboard with atomic score updates.
 
-### Data and Messaging
+At the end of a season, sharded scheduled jobs copy leaderboard pages from Redis into season-specific MySQL tables. Historical queries use dynamic table routing, and the expired Redis leaderboard is removed after persistence.
 
-- MySQL
-- MyBatis and MyBatis-Plus
-- Redis
-- Redisson distributed locks
-- RabbitMQ
-- Elasticsearch
+### Likes and write-behind aggregation
 
-### Microservice Infrastructure
+The remark service stores each business object's liked users in a Redis Set. Multi-item like-status checks use Redis pipelining to avoid repeated network round trips.
 
-- Nacos for service discovery and centralized configuration
-- Seata for distributed transaction support
-- XXL-JOB for scheduled and distributed jobs
-- Knife4j/OpenAPI for API documentation
+Like counts are coalesced in a Redis Sorted Set. A scheduled task removes a bounded batch every 20 seconds and publishes the latest counts to RabbitMQ; the owning service then updates its records in batches. Repeated likes and unlikes therefore collapse into the most recent count before database persistence.
 
-### Build and Operations
+### Promotion calculation
 
-- Maven
-- Docker
-- JUnit
-- Jenkins-compatible deployment script
-- Alibaba Cloud and Tencent Cloud storage, media, SMS, and payment integrations
+The promotion service supports fixed-amount, percentage, no-threshold, and tiered discounts through a strategy interface. It filters coupons by order value and course scope, generates valid ordered combinations, evaluates them concurrently with `CompletableFuture`, and returns the best results by discount value and coupon count.
 
+Exchange codes combine a Redis-allocated serial number with a checksum and an encoded payload. Codes are generated asynchronously, validated before lookup, and marked as redeemed through a Redis Bitmap to reject duplicate use.
 
-## Notable Engineering Work
+## Platform architecture
 
-### High-Concurrency Design
+```mermaid
+flowchart TB
+    Client["API client"] --> Gateway["Spring Cloud Gateway"]
+    Gateway --> Auth["Authentication and RBAC"]
+    Gateway --> Core["Course, learning, promotion, remark"]
+    Gateway --> Commerce["Trade and payment"]
+    Gateway --> Support["Search, media, messaging, exam, analytics"]
 
-The learning and promotion services use several mechanisms to handle concurrent requests safely and keep synchronous request paths lightweight:
+    Core --> Redis[(Redis)]
+    Core --> MySQL[(MySQL)]
+    Core <--> MQ[RabbitMQ]
+    Commerce --> MySQL
+    Commerce <--> MQ
+    Support --> MySQL
+    Support --> Search[(Elasticsearch)]
 
-- Applies a distributed lock per coupon during claims so multiple application instances cannot oversell the same inventory.
-- Uses atomic Redis hash increments for coupon stock and per-user limits, with compensating increments when validation or message publishing fails.
-- Marks exchange-code usage with a Redis bitmap to prevent duplicate redemption with a compact atomic operation.
-- Allocates exchange-code serial ranges through atomic Redis increments and generates codes asynchronously with a bounded executor.
-- Publishes successful claims and learning rewards to RabbitMQ so database persistence can happen outside latency-sensitive request paths.
-- Stores daily check-ins in Redis bitmaps, making duplicate detection and streak calculation memory-efficient.
-- Updates leaderboard scores with atomic Redis sorted-set increments instead of database read-modify-write operations.
-- Coalesces frequent video-progress updates in Redis and a delay queue, reducing repeated writes for the same lesson section.
-- Evaluates independent coupon combinations concurrently through a dedicated executor.
+    Services["Microservices"] --> Discovery["Nacos discovery and configuration"]
+    Services --> Jobs["Scheduled and distributed jobs"]
+```
 
-These choices make the code suitable for bursty, high-contention workflows. The repository does not claim a fixed throughput number because formal load-test benchmarks are not included.
+## Service map
 
-### Learning and Engagement
+| Module | Responsibility |
+| --- | --- |
+| `lf-learning` | Learning records, plans, Q&A, check-ins, points, and leaderboards |
+| `lf-promotion` | Coupon lifecycle, exchange codes, claim concurrency, and discount calculation |
+| `lf-remark` | Likes, pipelined status reads, and write-behind count aggregation |
+| `lf-course` | Course drafts, catalogues, instructors, media references, and publishing |
+| `lf-trade` / `lf-pay` | Cart, orders, enrollment, payment orchestration, and refunds |
+| `lf-auth` / `lf-gateway` | JWT authentication, RBAC, request filtering, and API routing |
+| `lf-search` | Elasticsearch course search, recommendations, and event-driven index updates |
+| `lf-message` / `lf-media` | Notifications, SMS adapters, file metadata, and video processing |
+| `lf-exam` / `lf-data` | Question bank, scoring data, dashboards, and reporting |
+| `lf-user` | Student, instructor, staff, and profile management |
+| `lf-api` / `lf-common` | Shared clients, DTOs, error handling, messaging, locking, and infrastructure helpers |
 
-- Records video progress while limiting unnecessary database writes.
-- Stores monthly check-ins as Redis bitmaps.
-- Applies daily reward limits and publishes points events asynchronously.
-- Builds real-time rankings with Redis sorted sets.
-- Persists completed seasons and supports historical leaderboard queries.
+## Technology
 
-### Promotions and Coupons
+The primary stack is Java 11, Spring Boot 2.7, Spring Cloud Gateway, OpenFeign, MySQL, MyBatis-Plus, Redis, Redisson, RabbitMQ, Elasticsearch, Maven, Docker, and JUnit.
 
-- Handles coupon inventory and per-user claim limits under concurrency.
-- Uses distributed locking to protect redemption and exchange-code workflows.
-- Generates compact exchange codes from encoded identifiers.
-- Calculates threshold, percentage, no-minimum, and tiered discounts.
-- Compares valid coupon combinations concurrently and returns the best result.
+The project also uses Nacos for service discovery and configuration, Seata for distributed transactions, XXL-JOB for distributed scheduling, Sentinel for service protection, and Knife4j/OpenAPI for API documentation. These tools are part of the implementation but are kept secondary here because they are less common in the US market than the core stack above.
+
+Alibaba Cloud and Tencent Cloud adapters are included for storage, video, SMS, and payment workflows.
 
 ## Build
 
 Requirements:
 
 - JDK 11
-- Maven 3.8+
-- MySQL, Redis, RabbitMQ, Nacos, and supporting services for runtime testing
+- Maven 3.8 or newer
+- MySQL, Redis, RabbitMQ, Nacos, and the configured supporting services for a full runtime environment
 
-Compile the complete project without running tests:
+Compile the complete Maven reactor without running tests:
 
 ```bash
 mvn -DskipTests compile
 ```
 
-The full 27-module Maven reactor has been verified with JDK 11.
+The complete 27-module Maven reactor has been compiled successfully with JDK 11. Runtime verification requires the external infrastructure and configuration referenced by the service bootstrap files.
 
-## Repository Naming
+## Project background
 
-The project uses the `com.learnforge` Java namespace and `lf-*` Maven module names.
-
+LearnForge is an English-language, rebranded adaptation of the educational [lusy37/tjxt](https://github.com/lusy37/tjxt) project. It was completed as a guided backend systems project, with the portfolio work centered on understanding, implementing, and documenting the learning, promotion, and engagement services.
